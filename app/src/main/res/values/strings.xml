@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">trabalho 2</string>
+    <string name="save_button_text">save</string>
+    <string name="clear_button_text">clear</string>
+    <string name="text_label_content">Content</string>
+    <string name="text_label_date">Date</string>
+</resources>
