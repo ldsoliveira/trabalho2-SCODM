@@ -2,6 +2,7 @@ package com.example.trabalho2_recyclerview
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -9,20 +10,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Adapter.OnItemClickListener, Adapter.OnLongClickListener {
+    var list = ArrayList<ListItem>()
+    var adapter = Adapter(list, this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var list = ArrayList<ListItem>()
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
         val clearBtn = findViewById<Button>(R.id.clearButton)
         val saveBtn = findViewById<Button>(R.id.saveButton)
-        val content = findViewById<EditText>(R.id.content)
-        val date = findViewById<EditText>(R.id.date)
+        val content: EditText = findViewById(R.id.content)
+        val date: EditText = findViewById(R.id.date)
         var count = 0
 
-        recyclerView.adapter = Adapter(list)
+        recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.setHasFixedSize(true)
 
@@ -35,11 +38,16 @@ class MainActivity : AppCompatActivity() {
             val newItem = ListItem(
                 content.text.toString(),
                 date.text.toString(),
-                count+1
+                count
             )
+            if (count > list.size) {
+                count = list.size
+                list.add(count, newItem)
+            } else {
+                list.add(count, newItem)
+            }
 
-            list.add(count, newItem)
-            recyclerView.adapter?.notifyItemInserted(count)
+            adapter.notifyItemInserted(count)
         }
 
         clearBtn.setOnClickListener {
@@ -59,5 +67,22 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         }
+    }
+
+    override fun onItemClick(position: Int) {
+        val clickedItem = list[position]
+        val content: EditText = findViewById(R.id.content)
+        val date: EditText = findViewById(R.id.date)
+
+        content.setText(clickedItem.content)
+        date.setText(clickedItem.date)
+
+        onLongItemClick(clickedItem.position)
+    }
+
+    override fun onLongItemClick(position: Int) {
+        val clickedItem = list[position]
+        list.remove(clickedItem)
+        adapter.notifyItemRemoved(position)
     }
 }
